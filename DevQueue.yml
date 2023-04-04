@@ -24,3 +24,4 @@ Resources:
         maxReceiveCount: 5
       KmsMasterKeyId: alias/aws/sqs
       KmsDataKeyReusePeriodSeconds: 300
+      #
