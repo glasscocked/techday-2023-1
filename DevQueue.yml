@@ -1,8 +1,26 @@
 ---
 AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Enable Server-Side Encryption (SSE)
+Parameters:
+  SQSQueueName:
+    Default: cc-worker-queue
+    Description: SQS Worker Queue
+    Type: String
+    MinLength: '1'
+    MaxLength: '63'
+    AllowedPattern: ^[0-9a-zA-Z-/]*$
+    ConstraintDescription: Must begin with a letter and must not end with a hyphen
+      or contain two consecutive hyphens.
 Resources:
-  DevBackendQueue:
+  SQSDeadLetterQueue:
+    Type: AWS::SQS::Queue
+  SQSSourceQueue:
     Type: AWS::SQS::Queue
     Properties:
-      QueueName: dev-queue-1
-      SqsManagedSseEnabled: true
+      QueueName: !Ref 'SQSQueueName'
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt 'SQSDeadLetterQueue.Arn'
+        maxReceiveCount: 5
+      KmsMasterKeyId: alias/aws/sqs
+      KmsDataKeyReusePeriodSeconds: 300
